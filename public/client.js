@@ -13,11 +13,6 @@
 // https://www.npmjs.com/package/@kitschpatrol/tweakpane-plugin-thumbnail-list
 // 
 // 
-// 
-// 
-// 
-// 
-// 
 // https://unpkg.com/tweakpane-latex/dist/tweakpane-latex.min.js
 // 
 // 
@@ -32,8 +27,12 @@ import * as TweakpaneEssentialsPlugin from 'https://cdn.jsdelivr.net/npm/@tweakp
 //import * as TweakCore from 'https://cdn.jsdelivr.net/npm/@tweakpane/core@2.0.5/dist/index.js';
 //import {createPlugin} from 'https://cdn.jsdelivr.net/npm/@tweakpane/core@2.0.5/dist/index.js';
 
+//import { Modal } from 'https://cdn.jsdelivr.net/npm/vanjs-ui@0.11.5/dist/van-ui.nomodule.min.js'
+import { Modal, FloatingWindow } from 'https://cdn.jsdelivr.net/npm/vanjs-ui@0.11.5/dist/van-ui.js';
+//console.log(Modal);
+
 // ==============================================
-const {div,style,script} = van.tags;
+const {div, style, script, p, button} = van.tags;
 //let TweakpaneLatexPlugin;
 
 //console.log(TweakPane);
@@ -257,6 +256,14 @@ const myStyle = style(`
       self.createDialogMessage('Hello World')
     })
 
+    pane.addButton({
+      title: 'Dialog Message',
+      //label: 'counter',   // optional
+    }).on('click', () => {
+      //console.log(self);
+      self.createDialogMessage02()
+    })
+
     // TEST PLUGIN
     // pane.addBlade({
     //   view: "latex",
@@ -393,8 +400,15 @@ const myStyle = style(`
     const self = this;
     let data = {};
     data.message = _message;
-    const divPane = div({style:`position:absolute; height:50%; bottom:50%; left:50%; opacity:1;`,class:'gameContainer'})
-    van.add(document.body,divPane)
+
+    const closed = van.state(false)
+
+    const divPane = div({style:`height:200px;`,class:'gameContainer'})
+    van.add(document.body, FloatingWindow(
+      {title:'Message',closed,width:202,height:240, disableResize: true},
+      divPane,
+    ))
+    //van.add(document.body,divPane)
     const pane = new Pane({
       title: 'Message',
       container:divPane,
@@ -426,6 +440,68 @@ const myStyle = style(`
       pane.dispose();
       self.addLogs('remove dialog message')
     })
+  }
+
+  createDialogMessage02(){
+
+    this.addLogs('init dialog message');
+    const self = this;
+    let data = {};
+    data.message = '_message';
+
+    const closed = van.state(false)
+    const divPane = div({style:`height:200px;`,class:'gameContainer'})
+
+    van.add(document.body, FloatingWindow(
+      {
+        closed, x: 300, y: 300, width: 200, height: 200,
+        windowStyleOverrides: {"background-color": "lightgray"},
+        childrenContainerStyleOverrides: {
+          display: "flex",
+          "align-items": "center",
+          "justify-content": "center",
+          height: "100%",
+        }
+      },
+      divPane
+      //button({onclick: () => closed.val = true}, "Close Window"),
+    ))
+
+    const pane = new Pane({
+      title: 'Message',
+      container:divPane,
+      expanded: true,
+    });
+    pane.addBinding(data, 'message', {
+      label:'',
+      readonly: true,
+      multiline: true,
+      rows: 5,
+    });
+    pane.addButton({
+      title: 'Okay',
+      //label: 'counter',   // optional
+    }).on('click', () => {
+      //console.log(self);
+      delete data.message;
+      divPane.remove();
+      pane.dispose();
+      self.addLogs('remove dialog message')
+      closed.val = true
+    })
+    pane.addButton({
+      title: 'Cancel',
+      //label: 'counter',   // optional
+    }).on('click', () => {
+      //console.log(self);
+      delete data.message;
+      divPane.remove();
+      pane.dispose();
+      self.addLogs('remove dialog message')
+      closed.val = true
+    })
+
+
   }
 
 
