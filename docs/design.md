@@ -10,4 +10,39 @@
 - security
 - database 
 - node
-- graph
+- 
+
+
+# design:
+
+ - module
+ - research
+ - data mining?
+ - factory units
+  - repair and support unit
+  - attacker
+  - range
+  - tank
+
+ - internet
+  - learning
+  - 
+
+ - hardware
+  - hard drive
+  - ram
+  - network
+  - firewall
+  - security
+  - os 
+
+  - virutal machinces
+
+ # constructions:
+ - security
+ - firewall
+ - firmware
+ - hardware
+ - mesh node
+ - scaner
+ - 

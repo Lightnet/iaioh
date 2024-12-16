@@ -13,6 +13,9 @@
 # Informtion:
   Using tweakpane as for role playing game. Prototype build.
 
+  Creating the Artificial intelligence visual world for game design build. It still some experiment.
+
+
 
 # dev:
   index.html is need for importmap for one reason is the import package name is not url address but name for some packages.
@@ -26,3 +29,14 @@
   }
 </script>
 ```
+
+
+# refs:
+ * https://github.com/tweenjs/tween.js
+ * https://www.npmjs.com/package/@tweenjs/tween.js
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 

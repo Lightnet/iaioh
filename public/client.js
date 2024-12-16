@@ -1,35 +1,44 @@
-// https://www.npmjs.com/package/@tweenjs/tween.js
 // 
+// 
+// 
+
+// https://www.npmjs.com/package/@tweenjs/tween.js
 // https://npmtrends.com/@createjs/tweenjs-vs-@tweenjs/tween.js-vs-animejs-vs-gsap-vs-popmotion
 // https://createjs.com/getting-started/tweenjs
 // https://sbcode.net/threejs/jeasings/
-// 
 // https://www.jsdelivr.com/package/npm/tweakpane-plugin-media
 // https://github.com/donmccurdy/tweakpane-plugin-thumbnail-list
 // https://github.com/panGenerator/tweakpane-textarea-plugin
 // https://github.com/metehus/tweakpane-image-plugin
 // https://github.com/LuchoTurtle/tweakpane-plugin-file-import
-// 
 // https://www.npmjs.com/package/@kitschpatrol/tweakpane-plugin-thumbnail-list
-// 
-// 
 // https://unpkg.com/tweakpane-latex/dist/tweakpane-latex.min.js
 // 
 // 
 
-import TWEEN from 'https://unpkg.com/three@0.170.0/examples/jsm/libs/tween.module.js'; //odd url error?
-import van from "https://cdn.jsdelivr.net/npm/vanjs-core@1.5.2/src/van.min.js";
+//import TWEEN from 'https://unpkg.com/three@0.170.0/examples/jsm/libs/tween.module.js'; //odd url error?
+//import van from "https://cdn.jsdelivr.net/npm/vanjs-core@1.5.2/src/van.min.js";
 
-import { Pane } from 'https://cdn.jsdelivr.net/npm/tweakpane@4.0.5/dist/tweakpane.min.js';
+//import { Pane } from 'https://cdn.jsdelivr.net/npm/tweakpane@4.0.5/dist/tweakpane.min.js';
 //import * as TweakPane from 'https://cdn.jsdelivr.net/npm/tweakpane@4.0.5/dist/tweakpane.min.js';
-import * as TweakpaneEssentialsPlugin from 'https://cdn.jsdelivr.net/npm/@tweakpane/plugin-essentials@0.2.1/dist/tweakpane-plugin-essentials.min.js';
+//import * as TweakpaneEssentialsPlugin from 'https://cdn.jsdelivr.net/npm/@tweakpane/plugin-essentials@0.2.1/dist/tweakpane-plugin-essentials.min.js';
 //import * as TweakpaneLatexPlugin from 'https://unpkg.com/tweakpane-latex/dist/tweakpane-latex.js';
 //import * as TweakCore from 'https://cdn.jsdelivr.net/npm/@tweakpane/core@2.0.5/dist/index.js';
 //import {createPlugin} from 'https://cdn.jsdelivr.net/npm/@tweakpane/core@2.0.5/dist/index.js';
 
 //import { Modal } from 'https://cdn.jsdelivr.net/npm/vanjs-ui@0.11.5/dist/van-ui.nomodule.min.js'
-import { Modal, FloatingWindow } from 'https://cdn.jsdelivr.net/npm/vanjs-ui@0.11.5/dist/van-ui.js';
+//import { Modal, FloatingWindow } from 'https://cdn.jsdelivr.net/npm/vanjs-ui@0.11.5/dist/van-ui.js';
 //console.log(Modal);
+
+import van from "vanjs-core";
+import TWEEN from "@tweenjs/tween.js"
+import  { Pane }from "tweakpane";
+import * as TweakpaneEssentialsPlugin from "@tweakpane/plugin-essentials";
+import { Modal, FloatingWindow } from "van-ui";
+
+import * as THREE from 'three';
+import { CSS3DRenderer, CSS3DObject } from 'three/addons/renderers/CSS3DRenderer.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 
 // ==============================================
 const {div, style, script, p, button} = van.tags;
@@ -150,9 +159,80 @@ class AppTweakGame {
     //this.setupScript()
     this.setupStyle();
     //this.initLogin()
+
+
+    this.initThree();
     this.initAccess();
     this.createTweakPane();
     this.run();
+  }
+
+  initThree(){
+    this.clock = new THREE.Clock();
+    this.scene = new THREE.Scene();
+    this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+    this.camera.position.set(0,200,200);
+
+    this.renderer = new THREE.WebGLRenderer();
+    this.renderer.setPixelRatio( window.devicePixelRatio );
+    this.renderer.setClearColor( 0x80a0e0);
+    this.renderer.domElement.style.position='absolute';
+    this.renderer.domElement.style.top='0px';
+    this.renderer.domElement.style.left='0px';
+    this.renderer.setSize( window.innerWidth, window.innerHeight );
+    window.addEventListener('resize', this.resizeRenderer.bind(this) )
+    // const update = this.update.bind(this);
+    // this.renderer.setAnimationLoop( update );
+
+    //CSS
+    this.cssRenderer = new CSS3DRenderer();
+    this.cssRenderer.domElement.style.position = 'absolute';
+    this.cssRenderer.domElement.style.top = '0px';
+    this.cssRenderer.setSize( window.innerWidth, window.innerHeight );
+
+    this.orbitControls = new OrbitControls( this.camera, this.cssRenderer.domElement );
+
+    van.add(document.body, this.renderer.domElement);
+    van.add(document.body, this.cssRenderer.domElement);
+    this.setupScene();
+  }
+
+  setupScene(){
+    const geometry = new THREE.BoxGeometry( 32, 32, 32 );
+    const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+    const cube = new THREE.Mesh( geometry, material );
+    this.scene.add( cube );
+
+    // const divEl = div({style:"width:100px;height:100px;",onclick:()=>clicktest()});
+    // divEl.style.backgroundColor='blue';
+    // //note if OrbitControls is use the over lay will not work
+    // console.log(divEl);
+    // const cssobject = new CSS3DObject( divEl );
+    // cssobject.position.set( 0, 32, 0 );
+    // cssobject.rotation.y = 0;
+    // this.scene.add(cssobject)
+
+
+  }
+
+  resizeRenderer(event) {
+    this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize( window.innerWidth, window.innerHeight );
+  }
+
+  updateRenderer(dt){
+
+    this.renderer.render( this.scene, this.camera );
+    this.cssRenderer.render( this.scene, this.camera );
+  }
+
+  setupHelpers(){
+    const size = 10;
+    const divisions = 10;
+  
+    this.gridHelper = new THREE.GridHelper( size, divisions );
+    this.scene.add( this.gridHelper );
   }
 
   initAccess(){
@@ -188,7 +268,7 @@ const myStyle = style(`
       expanded: true,
     });
     //console.log(TweakpaneEssentialsPlugin)
-    console.log(window)
+    //console.log(window)
 
     pane.registerPlugin(TweakpaneEssentialsPlugin);
     //pane.registerPlugin(window.TweakpaneLatexPlugin );
@@ -256,12 +336,12 @@ const myStyle = style(`
       self.createDialogMessage('Hello World')
     })
 
-    pane.addButton({
-      title: 'Dialog Message',
-      //label: 'counter',   // optional
-    }).on('click', () => {
-      //console.log(self);
+    pane.addButton({title: 'Dialog Message 2',}).on('click', () => {
       self.createDialogMessage02()
+    })
+
+    pane.addButton({title: 'Bot Time 2',}).on('click', () => {
+      self.bot_mine_test()
     })
 
     // TEST PLUGIN
@@ -286,7 +366,9 @@ const myStyle = style(`
 
   run(){
     const update = this.update.bind(this);
-    requestAnimationFrame(update)
+    //requestAnimationFrame(update)
+    this.renderer.setAnimationLoop( update );
+    //van.add(document.body, this.renderer.domElement);
   }
 
   updateLogic(){
@@ -299,6 +381,7 @@ const myStyle = style(`
   }
 
   update(){
+    const dt = this.clock.getDelta()
     if(this.isStart){
       //game logic
       this.updateLogic();
@@ -310,8 +393,9 @@ const myStyle = style(`
     // Rendering
     this.fpsGraph.end();
     //this.strLogs = ""
-    const update = this.update.bind(this);
-    requestAnimationFrame(update)
+    //const update = this.update.bind(this);
+    //requestAnimationFrame(update)
+    this.updateRenderer(dt)
   }
 
   initLogin(){
@@ -378,21 +462,42 @@ const myStyle = style(`
     const pane = new Pane({title: 'Menu',container:divPane,expanded: true});
     this.uiGame = pane;
 
-    pane.addButton({title: 'Research'}).on('click', () => {
+    // pane.addButton({title: 'Research'}).on('click', () => {
+    //   //console.log(self);
+    // })
+
+    // pane.addButton({title: ' Developement '}).on('click', () => {
+    //   //console.log(self);
+    // })
+
+    // pane.addButton({title: 'Bots'}).on('click', () => {
+    //   //console.log(self);
+    // })
+
+    // pane.addButton({title: 'Maps'}).on('click', () => {
+    //   //console.log(self);
+    // })
+
+    pane.addButton({title: 'Buildings'}).on('click', () => {
       //console.log(self);
     })
 
-    pane.addButton({title: 'Developement'}).on('click', () => {
+    pane.addButton({title: 'Constructions'}).on('click', () => {
       //console.log(self);
     })
 
-    pane.addButton({title: 'Bots'}).on('click', () => {
+    // pane.addButton({title: 'Hardwares'}).on('click', () => {
+    //   //console.log(self);
+    // })
+
+    // pane.addButton({title: 'Networks'}).on('click', () => {
+    //   //console.log(self);
+    // })
+
+    pane.addButton({title: 'Units'}).on('click', () => {
       //console.log(self);
     })
 
-    pane.addButton({title: 'Maps'}).on('click', () => {
-      //console.log(self);
-    })
   }
 
   createDialogMessage(_message){
@@ -448,10 +553,8 @@ const myStyle = style(`
     const self = this;
     let data = {};
     data.message = '_message';
-
     const closed = van.state(false)
     const divPane = div({style:`height:200px;`,class:'gameContainer'})
-
     van.add(document.body, FloatingWindow(
       {
         closed, x: 300, y: 300, width: 200, height: 200,
@@ -466,7 +569,6 @@ const myStyle = style(`
       divPane
       //button({onclick: () => closed.val = true}, "Close Window"),
     ))
-
     const pane = new Pane({
       title: 'Message',
       container:divPane,
@@ -500,10 +602,7 @@ const myStyle = style(`
       self.addLogs('remove dialog message')
       closed.val = true
     })
-
-
   }
-
 
   fadeShow(_div,_callback){
     const tween = new TWEEN
@@ -542,6 +641,86 @@ const myStyle = style(`
       _pane.dispose()
     }
     this.group.add(tween);
+  }
+
+  //=============================================
+  // 
+  //=============================================
+  bot_mine_test(){
+    this.addLogs('init bot test');
+    const self = this;
+    let data = {};
+    data.time = 0;
+    data.milliSeconds = 1000;
+    data.maxTime = 30;
+    data.timerId = null;
+    const closed = van.state(false)
+    const divPane = div({style:`height:200px;`,class:'gameContainer'})
+    van.add(document.body, FloatingWindow(
+      {
+        closed, x: 300, y: 300, width: 280, height: 200,
+        windowStyleOverrides: {"background-color": "lightgray"},
+        childrenContainerStyleOverrides: {
+          display: "flex",
+          "align-items": "center",
+          "justify-content": "center",
+          height: "100%",
+        }
+      },
+      divPane
+      //button({onclick: () => closed.val = true}, "Close Window"),
+    ))
+
+    function updateTime(){
+      data.time++;
+      if(data.time> data.maxTime){
+        data.time =0;
+      }
+    }
+    const pane = new Pane({
+      title: 'Message',
+      container:divPane,
+      expanded: true,
+    });
+    pane.addBinding(data, 'time', {readonly: true});
+    pane.addBinding(data, 'maxTime', {readonly: true});
+    pane.addBinding(data, 'milliSeconds', {readonly: true});
+    const buttonTime = pane.addButton({
+      title: 'Start',
+      //label: 'counter',   // optional
+    }).on('click', () => {
+      if(!data.timerId){
+        buttonTime.title = "Stop";
+        data.timerId =setInterval(()=>{
+          updateTime()
+        },data.milliSeconds)
+      }else{
+        console.log('Test timer')
+        buttonTime.title = "Start";
+        clearInterval(data.timerId);
+        data.timerId=null;
+      }
+    });
+    console.log(buttonTime);
+    // pane.addButton({
+    //   title: 'Stop',
+    //   //label: 'counter',   // optional
+    // }).on('click', () => {
+    //   clearInterval(data.timerId);
+    //   data.timerId=null;
+    // })
+
+    pane.addButton({
+      title: 'Close',
+      //label: 'counter',   // optional
+    }).on('click', () => {
+      //console.log(self);
+      delete data.message;
+      divPane.remove();
+      pane.dispose();
+      self.addLogs('remove dialog message')
+      closed.val = true
+    })
   }
 
 }
